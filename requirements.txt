@@ -1,0 +1,13 @@
+numpy
+pandas
+seaborn
+matplotlib
+catboost
+joblib
+lightgbm
+optuna
+streamlit
+xgboost
+markupsafe
+scikit-learn
+setuptools
