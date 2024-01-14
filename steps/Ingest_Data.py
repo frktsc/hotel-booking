@@ -12,12 +12,13 @@ class ingestData():
         return pd.read_csv(self.data_path)
 
 @step
-def ingest_df(data_path:str) -> pd.DataFrame:
+def ingest_df(data_path:str) -> pd.DataFrame:   
     try:
         ingest_Data=ingestData(data_path)
         df = ingest_Data.get_data()
         return df
-
+    
     except Exception as err:
         logging.error(f"error while ingesting data {err}")
         raise err
+    

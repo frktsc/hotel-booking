@@ -10,6 +10,3 @@ def Train_Pipeline(data_path:str):
     clean_Data(df)
     data_train(df)
     Evaluation_Data(df)
-
-
-
