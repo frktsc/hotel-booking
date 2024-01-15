@@ -3,62 +3,69 @@ from abc import ABC, abstractmethod
 from typing import Union
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder,StandardScaler
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.model_selection import train_test_split
 
 class DataStrategy(ABC):
-    def handle_data(self, data:pd.DataFrame) ->Union[pd.DataFrame,pd.Series]:
+    @abstractmethod
+    def handle_data(self, data: pd.DataFrame) -> Union[pd.DataFrame, pd.Series]:
         pass
 
-
-
-class Data_pre_process_strategy(DataStrategy):
-    def handle_data(self, data:pd.DataFrame) ->pd.DataFrame:
+class DataPreProcessStrategy(DataStrategy):
+    def handle_data(self, data: pd.DataFrame) -> pd.DataFrame:
         try:
-            data=data.drop(columns="company",axis=1,inplace=True)
-            data=data.dropna(axis=0)
-            data=data.drop_duplicates()
-            return data
+            data, transformed_data, preprocessor = self.preprocess_and_transform(data)
+            return transformed_data, preprocessor, data
+
 
         except Exception as err:
-            logging.error("error in preprocessing data {err}")
-            raise err
-    
-    def get_data_transformer_object(self,data:pd.DataFrame) -> pd.DataFrame:
-        try:
-            numerical_columns=data.select_dtypes(include=[np.number])
-            categorical_columns = data.select_dtypes(include=["object"])
+            logging.error(f"Error in processing data: {err}")
+            raise
 
-            num_pipeline= Pipeline(
-                steps=[
-                ("scaler",StandardScaler())
+    def preprocess_and_transform(self, data: pd.DataFrame) -> (pd.DataFrame, Pipeline):
+        try: 
+            data = data.drop(columns=["company"], axis=1)
+            data = data.dropna(axis=0)
+            data = data.drop_duplicates()
 
-                ]
+            numerical_columns = data.select_dtypes(include=[np.number]).columns
+            categorical_columns = data.select_dtypes(include=["object"]).columns
+
+            num_pipeline = Pipeline([("scaler", StandardScaler())])
+            cat_pipeline = Pipeline([("one_hot_encoder", OneHotEncoder()),
+                                     ("scaler", StandardScaler(with_mean=False))])
+            
+            preprocessor = ColumnTransformer(
+                [("num_pipeline", num_pipeline, numerical_columns),
+                 ("cat_pipeline", cat_pipeline, categorical_columns)]
             )
+            transformed_data = preprocessor.fit_transform(data)
+            return data, transformed_data, preprocessor
 
-            categorical_pipeline=Pipeline(
-
-                steps=[
-                ("one_hot_encoder",OneHotEncoder()),
-                ("scaler",StandardScaler(with_mean=False))
-                ]
-
-            )
-
-            logging.info(f"Categorical columns: {categorical_columns}")
-            logging.info(f"Numerical columns: {numerical_columns}")
-
-            preprocessor=ColumnTransformer(
-                [
-                ("num_pipeline",num_pipeline,numerical_columns),
-                ("cat_pipelines",categorical_pipeline,categorical_columns)
-
-                ]
-            )
-
-            return preprocessor
-        
         except Exception as err:
-            raise err
+            logging.error(f"Error in processing data: {err}")
+            raise
+
+class DatadivedStrategy(DataStrategy):
+    def handle_data(self, data: pd.DataFrame) -> Union[pd.DataFrame ,pd.Series]:
+        try:
+            X=data.drop(["is_canceled"],axis=1)
+            y=data["is_canceled"]
+            X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2,random_state=42)
+            return X_train, X_test, y_train, y_test
+        except Exception as err:
+            logging.error(f"Error in dividing data {err}")
+            raise
+
+class DataCleaning:
+    def __init__(self, data: pd.DataFrame, strategy: DataStrategy) -> None:
+        self.df = data
+        self.strategy = strategy
+
+    def handle_data(self) -> Union[pd.DataFrame, pd.Series]:
+        try:
+            return self.strategy.handle_data(self.df)
+        except Exception as err:
+            raise   
