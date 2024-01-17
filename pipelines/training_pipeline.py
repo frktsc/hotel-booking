@@ -11,5 +11,5 @@ model_config = ModelNameConfig(model_name="LogisticRegression")
 def Train_Pipeline(data_path:str):
     df=ingest_df(data_path)
     X_train, X_test, y_train, y_test=clean_Data(df)
-    model = data_train(X_train, X_test, y_train, y_test,model_config)
+    model = data_train(X_train, X_test, y_train, y_test)
     acc, cfm = Evaluation_Data(model, X_test, y_test)
