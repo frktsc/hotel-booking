@@ -65,7 +65,7 @@ class XGBoostModel(Model):
         return reg.score(x_test, y_test)
 
 
-class LinearRegressionModel(Model):
+class LogisticRegressionModel(Model):
  
 
     def train(self, x_train, y_train, **kwargs):

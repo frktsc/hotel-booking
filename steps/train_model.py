@@ -5,7 +5,7 @@ import pandas as pd
 from src.model_Developmet import (
     HyperparameterTuner,
     LightGBMModel,
-    LinearRegressionModel,
+    LogisticRegressionModel,
     RandomForestModel,
     XGBoostModel,
 )
@@ -41,7 +41,7 @@ def train_model(
             model = XGBoostModel()
         elif config.model_name == "linear_regression":
             mlflow.sklearn.autolog()
-            model = LinearRegressionModel()
+            model = LogisticRegressionModel()
         else:
             raise ValueError("Model name not supported")
 
