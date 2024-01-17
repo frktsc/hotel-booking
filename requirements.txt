@@ -12,3 +12,4 @@ markupsafe
 scikit-learn
 setuptools
 scipy
+pydantic
