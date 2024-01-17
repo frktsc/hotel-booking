@@ -1,5 +1,8 @@
-from pydantic import BaseModel
 from zenml.steps import BaseParameters
 
+
 class ModelNameConfig(BaseParameters):
-    model_name: str = "LogisticRegression"
+    """Model Configurations"""
+
+    model_name: str = "lightgbm"
+    fine_tuning: bool = True

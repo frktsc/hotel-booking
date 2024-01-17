@@ -53,6 +53,6 @@ def train_model(
         else:
             trained_model = model.train(x_train, y_train)
         return trained_model
-    except Exception as e:
-        logging.error(e)
-        raise e
+    except Exception as err:
+        logging.error(err)
+        raise 
